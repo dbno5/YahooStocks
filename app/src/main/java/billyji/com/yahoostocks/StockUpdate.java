@@ -1,13 +1,7 @@
 package billyji.com.yahoostocks;
 
-import java.util.Date;
-
-/**
- * Created by bj0716 on 10/21/17.
- */
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
 public class StockUpdate implements Serializable {
     private final String stockSymbol;

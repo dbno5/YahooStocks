@@ -21,11 +21,19 @@
                 android:id="@+id/stock_to_add"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Add a stock by symbol"
-                android:layout_alignParentLeft="true"
+                android:hint="@string/add_stock_hint"
                 android:imeOptions="actionDone"
                 android:inputType="textCapCharacters" />
         </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/generate_defaults"
+            android:text="@string/generate_default_stocks"
+            android:textAllCaps="false"
+            android:layout_below="@id/add_stock_layout"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/stock_updates_recycler_view"

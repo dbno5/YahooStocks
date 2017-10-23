@@ -5,11 +5,11 @@
         android:id="@+id/action_refresh"
         android:icon="@drawable/ic_launcher_background"
         android:orderInCategory="100"
-        android:title="Refresh"
+        android:title="@string/menu_refresh_option"
         app:showAsAction="always" />
 
     <item android:id="@+id/search"
-        android:title="search"
+        android:title="@string/menu_search_option"
         app:showAsAction="collapseActionView|ifRoom"
         app:actionViewClass="android.widget.SearchView" />
 </menu>

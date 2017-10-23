@@ -1,8 +1,6 @@
 package billyji.com.yahoostocks;
 
 import android.support.v7.widget.RecyclerView;
-import android.transition.TransitionManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,7 @@ import java.util.List;
 
 public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder> {
     private final List<StockUpdate> data = new ArrayList<>();
-    private RecyclerViewClickListener clickListener;
+    private final RecyclerViewClickListener clickListener;
 
     StockDataAdapter(RecyclerViewClickListener listener) {
         clickListener = listener;
@@ -40,7 +38,6 @@ public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder
     }
 
     public void add(StockUpdate newStockUpdate) {
-        int count = 0;
         for (StockUpdate stockUpdate : data) {
             if (stockUpdate.getStockSymbol().equals(newStockUpdate.getStockSymbol()))
             {

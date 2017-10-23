@@ -2,20 +2,22 @@ package billyji.com.yahoostocks;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -29,13 +31,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import butterknife.OnTextChanged;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-
-import static io.reactivex.internal.operators.observable.ObservableBlockingSubscribe.subscribe;
-
 
 public class MainActivity extends AppCompatActivity
 {
@@ -43,16 +41,19 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recyclerView;
     @BindView(R.id.stock_to_add)
     EditText stockToAdd;
+    @BindView(R.id.generate_defaults)
+    Button defaultsButton;
+
 
     private LinearLayoutManager layoutManager;
     private SearchView searchView;
 
     private StockDataAdapter stockDataAdapter;
     private YahooFinanceApiInterface yahooService;
+    private boolean hideButton;
     private final static String env = "store://datatables.org/alltableswithkeys";
-    public List<String> defaultStocks = new ArrayList<>(Arrays.asList("GOOG", "NFLX", "UNH", "MA", "AMZN", "ADP", "BBVA" ));
-    private StringBuilder totalQuery = new StringBuilder();
-
+    private final List<String> defaultStocks = new ArrayList<>(Arrays.asList("GOOG", "NFLX", "UNH", "MA", "AMZN", "ADP", "BBVA" ));
+    private final StringBuilder totalQuery = new StringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -75,7 +76,6 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setAdapter(stockDataAdapter);
 
         yahooService = new ApiClient().create();
-        addStocks(defaultStocks);
 
         stockToAdd.setOnEditorActionListener(
             new EditText.OnEditorActionListener() {
@@ -94,12 +94,38 @@ public class MainActivity extends AppCompatActivity
             });
     }
 
+    private boolean checkConnection()
+    {
+        ConnectivityManager cm =
+            (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork;
+
+        if (cm != null)
+        {
+            activeNetwork = cm.getActiveNetworkInfo();
+            boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+            if (!isConnected)
+            {
+                Snackbar
+                    .make(recyclerView, R.string.no_network_connection, Snackbar.LENGTH_LONG)
+                    .show();
+            }
+            hideButton = isConnected;
+            return isConnected;
+        }
+        return false;
+    }
+
     private void hideKeyboard()
     {
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+            if(imm != null)
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
@@ -129,6 +155,9 @@ public class MainActivity extends AppCompatActivity
 
     private void addStocks(List<String> stocks)
     {
+        if(!checkConnection())
+            return;
+
         StringBuilder stocksToAdd = new StringBuilder();
         for(String stock : stocks)
         {
@@ -159,6 +188,15 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
+    @OnClick(R.id.generate_defaults)
+    public void generateDefaults()
+    {
+        addStocks(defaultStocks);
+        if(hideButton)
+            defaultsButton.setVisibility(View.GONE);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -185,7 +223,7 @@ public class MainActivity extends AppCompatActivity
     private void queryYahoo(String stock)
     {
         String query = "select * from yahoo.finance.quote where symbol in (" + stock;
-        Log.e("tits", query);
+
         yahooService.yqlQuery(query, env)
             .subscribeOn(Schedulers.io())
             .map(r -> r.getQuery().getResults().getQuote())
@@ -200,8 +238,6 @@ public class MainActivity extends AppCompatActivity
                         .show();
                     return;
                 }
-
-                Log.d("APP", "New updateStocks " + stockUpdate.getStockSymbol());
                 stockDataAdapter.add(stockUpdate);
             });
     }

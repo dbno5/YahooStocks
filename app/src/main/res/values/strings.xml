@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">YahooStocks</string>
+    <string name="add_stock_hint">Add a stock by symbol</string>
+    <string name="menu_refresh_option">Refresh</string>
+    <string name="menu_search_option">search</string>
+    <string name="no_network_connection">There is no network connection.</string>
+    <string name="generate_default_stocks">Generate default stocks</string>
 </resources>
