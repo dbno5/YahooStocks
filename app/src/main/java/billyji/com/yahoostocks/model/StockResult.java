@@ -1,7 +1,10 @@
-package billyji.com.yahoostocks;
+package billyji.com.yahoostocks.model;
 
-public class StockResult {
+@SuppressWarnings("unused")
+public class StockResult
+{
     private StockQuery query;
+
     public StockQuery getQuery() {
         return query;
     }

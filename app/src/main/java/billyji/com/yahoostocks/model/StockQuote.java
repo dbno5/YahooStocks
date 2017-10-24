@@ -1,10 +1,12 @@
-package billyji.com.yahoostocks;
+package billyji.com.yahoostocks.model;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.math.BigDecimal;
 
-public class StockQuote {
+@SuppressWarnings("unused")
+public class StockQuote
+{
     private String symbol;
 
     @SerializedName("Name")
@@ -22,30 +24,30 @@ public class StockQuote {
     @SerializedName("Change")
     private BigDecimal change;
 
-    public BigDecimal getAsk()
+    BigDecimal getAsk()
     {
         return ask;
     }
 
-    public BigDecimal getBid()
+    BigDecimal getBid()
     {
         return bid;
     }
 
-    public BigDecimal getChange()
+    BigDecimal getChange()
     {
         return change;
     }
 
-    public String getSymbol() {
+    String getSymbol() {
         return symbol;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public BigDecimal getLastTradePriceOnly() {
+    BigDecimal getLastTradePriceOnly() {
         return lastTradePriceOnly;
     }
 }

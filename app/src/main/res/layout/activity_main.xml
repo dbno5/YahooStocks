@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="billyji.com.yahoostocks.MainActivity">
+    tools:context="billyji.com.yahoostocks.ui.MainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -24,6 +24,7 @@
                 android:hint="@string/add_stock_hint"
                 android:imeOptions="actionDone"
                 android:inputType="textCapCharacters"
+                android:windowSoftInputMode="stateHidden"
                 />
         </LinearLayout>
 

@@ -1,11 +1,12 @@
-package billyji.com.yahoostocks;
+package billyji.com.yahoostocks.network;
 
-
+import billyji.com.yahoostocks.model.StockResult;
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface YahooFinanceApiInterface {
+public interface YahooApiInterface
+{
     @GET("yql?format=json")
     Observable<StockResult> yqlQuery(
         @Query("q") String query,

@@ -1,4 +1,4 @@
-package billyji.com.yahoostocks;
+package billyji.com.yahoostocks.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -6,24 +6,28 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder> {
+import billyji.com.yahoostocks.R;
+import billyji.com.yahoostocks.model.StockUpdate;
+
+public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder>
+{
     private final List<StockUpdate> data = new ArrayList<>();
-    private List<StockUpdate> tempData = new ArrayList<>();
-    private List<StockUpdate> deletedData = new ArrayList<>();
+    private final List<StockUpdate> tempData = new ArrayList<>();
+    private final List<StockUpdate> deletedData = new ArrayList<>();
 
     @Override
-    public StockUpdateViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public StockUpdateViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stock_update_item, parent, false);
         return new StockUpdateViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(StockUpdateViewHolder holder, int position) {
+    public void onBindViewHolder(StockUpdateViewHolder holder, int position)
+    {
         StockUpdate stockUpdate = data.get(position);
         holder.setStockSymbol(stockUpdate.getStockSymbol());
         holder.setPrice(stockUpdate.getPrice());
@@ -38,8 +42,10 @@ public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder
         return data.size();
     }
 
-    public void add(StockUpdate newStockUpdate) {
-        for (StockUpdate stockUpdate : data) {
+    public void add(StockUpdate newStockUpdate)
+    {
+        for (StockUpdate stockUpdate : data)
+        {
             if (stockUpdate.getStockSymbol().equals(newStockUpdate.getStockSymbol()))
             {
                 if (stockUpdate.getPrice().equals(newStockUpdate.getPrice()))
@@ -53,18 +59,14 @@ public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder
                 break;
             }
         }
-
         data.add(0, newStockUpdate);
-
-        Collections.sort(data, new Comparator<StockUpdate>() {
-            @Override
-            public int compare(final StockUpdate object1, final StockUpdate object2) {
-                return object1.getStockSymbol().compareTo(object2.getStockSymbol());
-            }
-        });
-
+        sortList();
         notifyDataSetChanged();
+    }
 
+    private void sortList()
+    {
+        Collections.sort(data, (object1, object2) -> object1.getStockSymbol().compareTo(object2.getStockSymbol()));
     }
 
     public void filterList(String stockIdentifier)
@@ -75,25 +77,28 @@ public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder
 
         for(StockUpdate stock : tempData)
         {
-            if(stockIdentifier.length() > stock.getStockSymbol().length())
+            if(stockIdentifier.length() > stock.getStockSymbol().length() &&
+                !stock.getName().substring(0, stockIdentifier.length()).toUpperCase().equals(stockIdentifier.toUpperCase()))
             {
                 data.remove(stock);
                 deletedData.add(stock);
             }
-            else if(!stock.getStockSymbol().substring(0, stockIdentifier.length()).equals(stockIdentifier) &&
-                !stock.getName().substring(0, stockIdentifier.length()).equals(stockIdentifier))
+
+            else if(stockIdentifier.length() > stock.getStockSymbol().length() &&
+                stock.getName().substring(0, stockIdentifier.length()).toUpperCase().equals(stockIdentifier.toUpperCase()))
+            {
+                //empty statement, just checking for length so string length isn't exceeded in next statement
+            }
+
+            else if(!stock.getStockSymbol().substring(0, stockIdentifier.length()).equals(stockIdentifier.toUpperCase()) &&
+                !stock.getName().substring(0, stockIdentifier.length()).toUpperCase().equals(stockIdentifier.toUpperCase()))
             {
                 data.remove(stock);
                 deletedData.add(stock);
             }
         }
 
-        Collections.sort(data, new Comparator<StockUpdate>() {
-            @Override
-            public int compare(final StockUpdate object1, final StockUpdate object2) {
-                return object1.getStockSymbol().compareTo(object2.getStockSymbol());
-            }
-        });
+        sortList();
 
         notifyDataSetChanged();
         tempData.clear();

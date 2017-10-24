@@ -1,4 +1,4 @@
-package billyji.com.yahoostocks;
+package billyji.com.yahoostocks.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,7 +13,7 @@ public class StockUpdate implements Serializable {
 
     public final static String INVALID_STOCK = "INVALID";
 
-    public StockUpdate(String stockSymbol, BigDecimal price, String name, BigDecimal ask, BigDecimal bid, BigDecimal change) {
+    private StockUpdate(String stockSymbol, BigDecimal price, String name, BigDecimal ask, BigDecimal bid, BigDecimal change) {
         this.stockSymbol = stockSymbol;
         this.price = price;
         this.name = name;
@@ -22,9 +22,9 @@ public class StockUpdate implements Serializable {
         this.change = change == null ? new BigDecimal(-1) : change;
     }
 
-    public StockUpdate(String nullUpdate)
+    private StockUpdate()
     {
-        this.stockSymbol = nullUpdate;
+        this.stockSymbol = StockUpdate.INVALID_STOCK;
         this.price = null;
         this.name = null;
         this.ask = null;
@@ -61,7 +61,7 @@ public class StockUpdate implements Serializable {
 
     public static StockUpdate create(StockQuote r) {
         if(r.getName() == null || r.getSymbol() == null)
-            return new StockUpdate(INVALID_STOCK);
+            return new StockUpdate();
 
         return new StockUpdate(r.getSymbol(), r.getLastTradePriceOnly(), r.getName(), r.getAsk(), r.getBid(), r.getChange());
     }

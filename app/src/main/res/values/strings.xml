@@ -4,6 +4,6 @@
     <string name="menu_refresh_option">Refresh</string>
     <string name="menu_search_option">search</string>
     <string name="no_network_connection">There is no network connection.</string>
-    <string name="generate_default_stocks">Generate default stocks</string>
+    <string name="no_such_stock_symbol">Could not find this stock symbol</string>
     <string name="search_query_hint">Search by symbol or name</string>
 </resources>

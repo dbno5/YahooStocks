@@ -1,20 +1,21 @@
-package billyji.com.yahoostocks;
+package billyji.com.yahoostocks.network;
 
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
-public class ApiClient {
+class YahooApiClient
+{
+    private final static String BASE_URL = "https://query.yahooapis.com/v1/public/";
 
     final private Retrofit retrofit = new Retrofit.Builder()
         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl("https://query.yahooapis.com/v1/public/")
+        .baseUrl(BASE_URL)
         .build();
 
-    public YahooFinanceApiInterface create() {
-        return retrofit.create(YahooFinanceApiInterface.class);
+    YahooApiInterface create() {
+        return retrofit.create(YahooApiInterface.class);
     }
 }
