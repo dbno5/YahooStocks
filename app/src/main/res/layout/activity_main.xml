@@ -23,7 +23,8 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/add_stock_hint"
                 android:imeOptions="actionDone"
-                android:inputType="textCapCharacters" />
+                android:inputType="textCapCharacters"
+                android:visibility="gone"/>
         </LinearLayout>
 
         <Button

@@ -30,6 +30,9 @@ public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder
         holder.setStockSymbol(stockUpdate.getStockSymbol());
         holder.setPrice(stockUpdate.getPrice());
         holder.setName(stockUpdate.getName());
+        holder.setAsk(stockUpdate.getAsk());
+        holder.setBid(stockUpdate.getBid());
+        holder.setChange(stockUpdate.getChange());
     }
 
     @Override

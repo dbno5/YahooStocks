@@ -4,10 +4,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.math.BigDecimal;
 
-/**
- * Created by bj0716 on 10/21/17.
- */
-
 public class StockQuote {
     private String symbol;
 
@@ -17,14 +13,29 @@ public class StockQuote {
     @SerializedName("LastTradePriceOnly")
     private BigDecimal lastTradePriceOnly;
 
-    @SerializedName("DaysLow")
-    private BigDecimal daysLow;
+    @SerializedName("Ask")
+    private BigDecimal ask;
 
-    @SerializedName("DaysHigh")
-    private BigDecimal daysHigh;
+    @SerializedName("Bid")
+    private BigDecimal bid;
 
-    @SerializedName("Volume")
-    private String volume;
+    @SerializedName("Change")
+    private BigDecimal change;
+
+    public BigDecimal getAsk()
+    {
+        return ask;
+    }
+
+    public BigDecimal getBid()
+    {
+        return bid;
+    }
+
+    public BigDecimal getChange()
+    {
+        return change;
+    }
 
     public String getSymbol() {
         return symbol;
@@ -32,18 +43,6 @@ public class StockQuote {
 
     public String getName() {
         return name;
-    }
-
-    public BigDecimal getDaysLow() {
-        return daysLow;
-    }
-
-    public BigDecimal getDaysHigh() {
-        return daysHigh;
-    }
-
-    public String getVolume() {
-        return volume;
     }
 
     public BigDecimal getLastTradePriceOnly() {

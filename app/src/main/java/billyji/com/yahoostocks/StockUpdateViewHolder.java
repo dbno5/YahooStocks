@@ -2,6 +2,7 @@ package billyji.com.yahoostocks;
 
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -32,6 +33,12 @@ public class StockUpdateViewHolder extends RecyclerView.ViewHolder implements Vi
     TextView name;
     @BindView(R.id.stock_item_price)
     TextView price;
+    @BindView(R.id.stock_item_ask)
+    TextView ask;
+    @BindView(R.id.stock_item_bid)
+    TextView bid;
+    @BindView(R.id.stock_item_change)
+    TextView change;
     @BindView(R.id.additional_details)
     RelativeLayout additionalDetailView;
 
@@ -58,6 +65,37 @@ public class StockUpdateViewHolder extends RecyclerView.ViewHolder implements Vi
         this.name.setText(name);
     }
 
+    public void setAsk(BigDecimal ask)
+    {
+        if(ask.intValue() == -1)
+            this.ask.append("N/A");
+        else
+            this.ask.append(PRICE_FORMAT.format(ask.floatValue()));
+    }
+
+    public void setBid(BigDecimal bid)
+    {
+        if(bid.intValue() == -1)
+            this.bid.append("N/A");
+        else
+            this.bid.append(PRICE_FORMAT.format(bid.floatValue()));
+    }
+
+    public void setChange(BigDecimal change)
+    {
+        setPriceColor(change);
+        if(change.intValue() == -1)
+            this.change.append("N/A");
+        else
+            this.change.append(PRICE_FORMAT.format(change.floatValue()));
+    }
+
+    public void setPriceColor(BigDecimal change)
+    {
+        if (change.floatValue() < 0 && change.intValue() != -1)
+            this.price.setTextColor(Color.parseColor("#FF0000"));
+    }
+
     @Override
     public void onClick(final View view) {
         // If the originalHeight is 0 then find the height of the View being used
@@ -72,10 +110,10 @@ public class StockUpdateViewHolder extends RecyclerView.ViewHolder implements Vi
             additionalDetailView.setVisibility(View.VISIBLE);
             additionalDetailView.setEnabled(true);
             isViewExpanded = true;
-            valueAnimator = ValueAnimator.ofInt(originalHeight, originalHeight * 2); // These values in this method can be changed to expand however much you like
+            valueAnimator = ValueAnimator.ofInt(originalHeight, (int)(originalHeight * 1.8)); // These values in this method can be changed to expand however much you like
         } else {
             isViewExpanded = false;
-            valueAnimator = ValueAnimator.ofInt(originalHeight * 2, originalHeight);
+            valueAnimator = ValueAnimator.ofInt((int)(originalHeight * 1.8), originalHeight);
 
             Animation a = new AlphaAnimation(1.00f, 0.00f); // Fade out
 
@@ -106,7 +144,7 @@ public class StockUpdateViewHolder extends RecyclerView.ViewHolder implements Vi
         valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         valueAnimator.addUpdateListener(new AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
-                view.getLayoutParams().height = (Integer) animation.getAnimatedValue();;
+                view.getLayoutParams().height = (Integer) animation.getAnimatedValue();
                 view.requestLayout();
             }
         });

@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,7 +43,6 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.generate_defaults)
     Button defaultsButton;
 
-
     private LinearLayoutManager layoutManager;
     private SearchView searchView;
 
@@ -52,7 +50,7 @@ public class MainActivity extends AppCompatActivity
     private YahooFinanceApiInterface yahooService;
     private boolean hideButton;
     private final static String env = "store://datatables.org/alltableswithkeys";
-    private final List<String> defaultStocks = new ArrayList<>(Arrays.asList("GOOG", "NFLX", "UNH", "MA", "AMZN", "ADP", "BBVA" ));
+    private final List<String> defaultStocks = new ArrayList<>(Arrays.asList( "UNH", "MA", "AMZ", "AMZN", "ADP", "BBVA" ));
     private final StringBuilder totalQuery = new StringBuilder();
 
     @Override
@@ -155,9 +153,6 @@ public class MainActivity extends AppCompatActivity
 
     private void addStocks(List<String> stocks)
     {
-        if(!checkConnection())
-            return;
-
         StringBuilder stocksToAdd = new StringBuilder();
         for(String stock : stocks)
         {
@@ -194,7 +189,10 @@ public class MainActivity extends AppCompatActivity
     {
         addStocks(defaultStocks);
         if(hideButton)
+        {
             defaultsButton.setVisibility(View.GONE);
+            stockToAdd.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -216,34 +214,65 @@ public class MainActivity extends AppCompatActivity
 
     private void addStock(String stockSymbol)
     {
-        String processedStockSymbol = "'MA','" + stockSymbol + "')";
-        queryYahoo(processedStockSymbol);
+        String processedStockSymbol = processString(stockSymbol);
+        if(!processedStockSymbol.equals("NO"))
+            queryYahoo(processedStockSymbol);
+    }
+
+    private String processString(String stockSymbol)
+    {
+        if(checkIfValidString(stockSymbol))
+            return "'MA','" + stockSymbol + "')";
+
+        showCouldNotFindStockSymbolMessage();
+        return "NO";
+    }
+
+    private boolean checkIfValidString(String stockSymbol)
+    {
+        return stockSymbol.matches("[a-zA-Z.]+");
+    }
+
+    private void showCouldNotFindStockSymbolMessage()
+    {
+        Snackbar
+            .make(recyclerView, "Couldn't find this stock symbol", Snackbar.LENGTH_LONG)
+            .show();
     }
 
     private void queryYahoo(String stock)
     {
-        String query = "select * from yahoo.finance.quote where symbol in (" + stock;
+        if(!checkConnection())
+            return;
 
-        yahooService.yqlQuery(query, env)
+        String query = "select * from yahoo.finance.quotes where symbol in (" + stock;
+
+        //here need to only call once with totalquery string, need to
+        //stop previous call as well
+//        Observable.interval(0, 5, TimeUnit.SECONDS)
+//            .flatMap(i ->
+            yahooService.yqlQuery(query, env)
             .subscribeOn(Schedulers.io())
             .map(r -> r.getQuery().getResults().getQuote())
             .flatMap(Observable::fromIterable)
             .map(StockUpdate::create)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(stockUpdate -> {
-                if(stockUpdate.getStockSymbol().equals("dummy"))
+                if(stockUpdate.getStockSymbol().equals("INVALID"))
                 {
-                    Snackbar
-                        .make(recyclerView, "Couldn't find this stock symbol", Snackbar.LENGTH_LONG)
-                        .show();
+                    showCouldNotFindStockSymbolMessage();
                     return;
                 }
+                Log.e("hey", "hey");
                 stockDataAdapter.add(stockUpdate);
             });
     }
 
     private void updateStocks()
     {
+        if(totalQuery.length() == 0)
+            return;
+
         totalQuery.setLength(Math.max(totalQuery.length() - 1, 0));
         totalQuery.append(")");
         queryYahoo(totalQuery.toString());
