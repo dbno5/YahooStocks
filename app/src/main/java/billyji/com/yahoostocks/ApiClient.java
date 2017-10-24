@@ -17,5 +17,4 @@ public class ApiClient {
     public YahooFinanceApiInterface create() {
         return retrofit.create(YahooFinanceApiInterface.class);
     }
-
 }

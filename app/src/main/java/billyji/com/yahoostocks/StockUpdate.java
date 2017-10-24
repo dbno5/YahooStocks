@@ -11,7 +11,7 @@ public class StockUpdate implements Serializable {
     private final BigDecimal bid;
     private final BigDecimal change;
 
-    private final static String INVALID_STOCK = "INVALID";
+    public final static String INVALID_STOCK = "INVALID";
 
     public StockUpdate(String stockSymbol, BigDecimal price, String name, BigDecimal ask, BigDecimal bid, BigDecimal change) {
         this.stockSymbol = stockSymbol;

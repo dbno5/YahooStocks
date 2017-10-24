@@ -44,13 +44,12 @@ public class StockUpdateViewHolder extends RecyclerView.ViewHolder implements Vi
 
     private int originalHeight = 0;
     private boolean isViewExpanded = false;
-    private final RecyclerViewClickListener clickListener;
+    private final StringBuilder sb = new StringBuilder();
 
-    public StockUpdateViewHolder(View v, RecyclerViewClickListener listener) {
+    public StockUpdateViewHolder(View v) {
         super(v);
         ButterKnife.bind(this, v);
         v.setOnClickListener(this);
-        clickListener = listener;
     }
 
     public void setStockSymbol(String stockSymbol) {
@@ -68,26 +67,40 @@ public class StockUpdateViewHolder extends RecyclerView.ViewHolder implements Vi
     public void setAsk(BigDecimal ask)
     {
         if(ask.intValue() == -1)
-            this.ask.append("N/A");
+            this.ask.setText("N/A");
         else
-            this.ask.append(PRICE_FORMAT.format(ask.floatValue()));
+        {
+            sb.append("Ask: ");
+            sb.append(PRICE_FORMAT.format(ask.floatValue()));
+            this.ask.setText(sb.toString());
+            sb.setLength(0);
+        }
     }
 
     public void setBid(BigDecimal bid)
     {
         if(bid.intValue() == -1)
-            this.bid.append("N/A");
+            this.bid.setText("N/A");
         else
-            this.bid.append(PRICE_FORMAT.format(bid.floatValue()));
-    }
+        {
+            sb.append("Bid: ");
+            sb.append(PRICE_FORMAT.format(bid.floatValue()));
+            this.bid.setText(sb.toString());
+            sb.setLength(0);
+        }}
 
     public void setChange(BigDecimal change)
     {
         setPriceColor(change);
         if(change.intValue() == -1)
-            this.change.append("N/A");
+            this.change.setText("N/A");
         else
-            this.change.append(PRICE_FORMAT.format(change.floatValue()));
+        {
+            sb.append("Change: ");
+            sb.append(PRICE_FORMAT.format(change.floatValue()));
+            this.change.setText(sb.toString());
+            sb.setLength(0);
+        }
     }
 
     public void setPriceColor(BigDecimal change)
@@ -149,8 +162,6 @@ public class StockUpdateViewHolder extends RecyclerView.ViewHolder implements Vi
             }
         });
         valueAnimator.start();
-
-//        clickListener.onClick(view, getAdapterPosition());
 
     }
 }

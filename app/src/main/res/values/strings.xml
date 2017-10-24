@@ -5,7 +5,5 @@
     <string name="menu_search_option">search</string>
     <string name="no_network_connection">There is no network connection.</string>
     <string name="generate_default_stocks">Generate default stocks</string>
-    <string name="ask">Ask:&#160;</string>
-    <string name="bid">Bid:&#160;</string>
-    <string name="change">Change:&#160;</string>
+    <string name="search_query_hint">Search by symbol or name</string>
 </resources>

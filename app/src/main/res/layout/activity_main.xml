@@ -24,17 +24,8 @@
                 android:hint="@string/add_stock_hint"
                 android:imeOptions="actionDone"
                 android:inputType="textCapCharacters"
-                android:visibility="gone"/>
+                />
         </LinearLayout>
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/generate_defaults"
-            android:text="@string/generate_default_stocks"
-            android:textAllCaps="false"
-            android:layout_below="@id/add_stock_layout"
-            />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/stock_updates_recycler_view"
@@ -43,7 +34,4 @@
             android:layout_below="@id/add_stock_layout"
             />
     </RelativeLayout>
-
-
-
 </android.support.constraint.ConstraintLayout>

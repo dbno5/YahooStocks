@@ -16,11 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +26,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
-import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -40,17 +36,13 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recyclerView;
     @BindView(R.id.stock_to_add)
     EditText stockToAdd;
-    @BindView(R.id.generate_defaults)
-    Button defaultsButton;
 
     private LinearLayoutManager layoutManager;
-    private SearchView searchView;
 
     private StockDataAdapter stockDataAdapter;
     private YahooFinanceApiInterface yahooService;
-    private boolean hideButton;
     private final static String env = "store://datatables.org/alltableswithkeys";
-    private final List<String> defaultStocks = new ArrayList<>(Arrays.asList( "UNH", "MA", "AMZ", "AMZN", "ADP", "BBVA" ));
+    private final List<String> defaultStocks = new ArrayList<>(Arrays.asList( "UNH", "MA", "AMZN", "ADP", "BBVA" ));
     private final StringBuilder totalQuery = new StringBuilder();
 
     @Override
@@ -66,14 +58,11 @@ public class MainActivity extends AppCompatActivity
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        RecyclerViewClickListener listener = (view, position) -> {
-            Toast.makeText(this, "Position " + position, Toast.LENGTH_SHORT).show();
-        };
-
-        stockDataAdapter = new StockDataAdapter(listener);
+        stockDataAdapter = new StockDataAdapter();
         recyclerView.setAdapter(stockDataAdapter);
 
         yahooService = new ApiClient().create();
+        addStocks(defaultStocks);
 
         stockToAdd.setOnEditorActionListener(
             new EditText.OnEditorActionListener() {
@@ -110,7 +99,6 @@ public class MainActivity extends AppCompatActivity
                     .make(recyclerView, R.string.no_network_connection, Snackbar.LENGTH_LONG)
                     .show();
             }
-            hideButton = isConnected;
             return isConnected;
         }
         return false;
@@ -125,30 +113,6 @@ public class MainActivity extends AppCompatActivity
             if(imm != null)
                 imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-    }
-
-    @Override
-    protected void onStart()
-    {
-        super.onStart();
-//        searchView.setOnQueryTextListener(new OnQueryTextListener()
-//        {
-//            @Override
-//            public boolean onQueryTextSubmit(String query)
-//            {
-//                String requestName = searchView.getQuery().toString().trim();
-//                Log.e("tits", requestName);
-//                stockDataAdapter.search(requestName);
-//
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String query)
-//            {
-//                return false;
-//            }
-//        });
     }
 
     private void addStocks(List<String> stocks)
@@ -172,27 +136,33 @@ public class MainActivity extends AppCompatActivity
     {
         getMenuInflater().inflate(R.menu.menu_options, menu);
 
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager =
-            (SearchManager) getSystemService(SEARCH_SERVICE);
-        SearchView searchView =
-            (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-            searchManager.getSearchableInfo(getComponentName()));
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search)
+            .getActionView();
 
-        return true;
-    }
-
-
-    @OnClick(R.id.generate_defaults)
-    public void generateDefaults()
-    {
-        addStocks(defaultStocks);
-        if(hideButton)
+        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener()
         {
-            defaultsButton.setVisibility(View.GONE);
-            stockToAdd.setVisibility(View.VISIBLE);
+            public boolean onQueryTextChange(String newText)
+            {
+                stockDataAdapter.filterList(newText);
+                return true;
+            }
+
+            public boolean onQueryTextSubmit(String query)
+            {
+                return false;
+            }
+        };
+        if (searchView != null && searchManager != null)
+        {
+            searchView.setSearchableInfo(searchManager
+                .getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(false);
+            searchView.setQueryHint(getString(R.string.search_query_hint));
+            searchView.setOnQueryTextListener(queryTextListener);
         }
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -215,7 +185,7 @@ public class MainActivity extends AppCompatActivity
     private void addStock(String stockSymbol)
     {
         String processedStockSymbol = processString(stockSymbol);
-        if(!processedStockSymbol.equals("NO"))
+        if(!processedStockSymbol.equals(StockUpdate.INVALID_STOCK))
             queryYahoo(processedStockSymbol);
     }
 
@@ -225,7 +195,7 @@ public class MainActivity extends AppCompatActivity
             return "'MA','" + stockSymbol + "')";
 
         showCouldNotFindStockSymbolMessage();
-        return "NO";
+        return StockUpdate.INVALID_STOCK;
     }
 
     private boolean checkIfValidString(String stockSymbol)
@@ -258,12 +228,11 @@ public class MainActivity extends AppCompatActivity
             .map(StockUpdate::create)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(stockUpdate -> {
-                if(stockUpdate.getStockSymbol().equals("INVALID"))
+                if(stockUpdate.getStockSymbol().equals(StockUpdate.INVALID_STOCK))
                 {
                     showCouldNotFindStockSymbolMessage();
                     return;
                 }
-                Log.e("hey", "hey");
                 stockDataAdapter.add(stockUpdate);
             });
     }

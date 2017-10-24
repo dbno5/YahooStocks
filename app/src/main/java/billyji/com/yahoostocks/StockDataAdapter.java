@@ -6,22 +6,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder> {
     private final List<StockUpdate> data = new ArrayList<>();
-    private final RecyclerViewClickListener clickListener;
-
-    StockDataAdapter(RecyclerViewClickListener listener) {
-        clickListener = listener;
-    }
+    private List<StockUpdate> tempData = new ArrayList<>();
+    private List<StockUpdate> deletedData = new ArrayList<>();
 
     @Override
     public StockUpdateViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stock_update_item, parent, false);
-        return new StockUpdateViewHolder(v, clickListener);
+        return new StockUpdateViewHolder(v);
     }
 
     @Override
@@ -69,8 +67,35 @@ public class StockDataAdapter extends RecyclerView.Adapter<StockUpdateViewHolder
 
     }
 
-    public void search(String stockIdentifier)
+    public void filterList(String stockIdentifier)
     {
+        data.addAll(deletedData);
+        deletedData.clear();
+        tempData.addAll(data);
 
+        for(StockUpdate stock : tempData)
+        {
+            if(stockIdentifier.length() > stock.getStockSymbol().length())
+            {
+                data.remove(stock);
+                deletedData.add(stock);
+            }
+            else if(!stock.getStockSymbol().substring(0, stockIdentifier.length()).equals(stockIdentifier) &&
+                !stock.getName().substring(0, stockIdentifier.length()).equals(stockIdentifier))
+            {
+                data.remove(stock);
+                deletedData.add(stock);
+            }
+        }
+
+        Collections.sort(data, new Comparator<StockUpdate>() {
+            @Override
+            public int compare(final StockUpdate object1, final StockUpdate object2) {
+                return object1.getStockSymbol().compareTo(object2.getStockSymbol());
+            }
+        });
+
+        notifyDataSetChanged();
+        tempData.clear();
     }
 }
